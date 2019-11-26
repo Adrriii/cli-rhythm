@@ -18,6 +18,7 @@ long timeMs(int *t){
 void clearScreen()
 {
   int r = system("clear");
+  printf("\e[?25l");
 }
 
 void moveCursor(int x, int y) {
@@ -44,7 +45,7 @@ void main(const char* argv, const int argc) {
         exit(0);
     }
 
-    int FPS_CAP = 1000 / 60;
+    int FPS_CAP = 1000 / 120;
     int ft;
 
     gameState->scrollspeed = FPS_CAP * 2;
@@ -98,7 +99,23 @@ void update(GameState* gameState) {
             
             if(line >= 0) {
                 if(line < gameState->lines) {
-                    gameState->notes[(k * gameState->lines) + (gameState->lines - line)] = 1;
+
+                    if(line % 2 == 0) {
+                        gameState->notes[(k * gameState->lines) + (gameState->lines - line)] = 2;
+                    } else {
+                        int val = gameState->notes[(k * gameState->lines) + (gameState->lines - line)];
+                        switch(val) {
+                            case 0:
+                                gameState->notes[(k * gameState->lines) + (gameState->lines - line)] = 1;
+                                break;
+                            case -1:
+                                gameState->notes[(k * gameState->lines) + (gameState->lines - line)] = 2;
+                                break;
+                            case 1:
+                                gameState->notes[(k * gameState->lines) + (gameState->lines - line)] = -1;
+                                break;
+                        }
+                    }
                     //printf("%d:%d\n",(k * gameState->lines),(gameState->lines - line - 1));
                 } else {
                     break;
@@ -130,17 +147,22 @@ void drawBoardInit(GameState* gameState) {
 }
 
 void drawBoard(GameState* gameState) {
-    for(int l = 0; l < gameState->lines; l++) {
-        for(int k = 0; k < gameState->keys; k++) {
+    for(int k = 0; k < gameState->keys; k++) {
+        for(int l = 0; l < gameState->lines; l++) {
             moveCursor(l,29 + (k*6));
-            if(gameState->notes[(k * gameState->lines) + l]) {
-                printf("░░░░░░");
-            }
-            else {
-                printf("      ");
-            }
-            if(k != gameState->keys -1) {
-                //putchar('');
+            switch(gameState->notes[(k * gameState->lines) + l]) {
+                case 0:
+                    printf("      ");
+                    break;
+                case 1:
+                    printf("▄▄▄▄▄▄");
+                    break;
+                case -1:
+                    printf("▄▄▄▄▄▄");
+                    break;
+                case 2:
+                    printf("██████");
+                    break;
             }
         }
     }
@@ -200,7 +222,7 @@ Map* parseMap(char* path) {
 
 int timeDistanceToLine(GameState* gameState, int time) {
     //printf("(%d - %d) / %d",(gameState->time - gameState->start_time), (time * 1000), gameState->scrollspeed);
-    return ((gameState->time - gameState->start_time) - time ) / gameState->scrollspeed;
+    return ((gameState->time - gameState->start_time) - time ) / (gameState->scrollspeed * 2);
 }
 
 

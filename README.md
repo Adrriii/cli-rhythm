@@ -2,6 +2,10 @@
 
 # Compiling
 
+## Dependencies
+
+make and gcc
+
 ## Linux
 
 make
