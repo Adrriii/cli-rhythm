@@ -27,7 +27,7 @@ void moveCursor(int x, int y) {
 
 
 void main(const char* argv, const int argc) {
-    char* map_path = "maps/map2.cry";
+    char* map_path = "maps/map.cry";
 
     int starttime;
     int lasttime;
@@ -49,7 +49,7 @@ void main(const char* argv, const int argc) {
     int FPS_CAP = 1000 / 120;
     int ft;
 
-    gameState->scrollspeed = FPS_CAP * 1.5;
+    gameState->scrollspeed = FPS_CAP / 1.5;
 
     timeMs ( &(gameState->start_time) );
     timeMs ( &lasttime );
@@ -97,13 +97,16 @@ void update(GameState* gameState) {
         while(n != NULL) {
             int line = -timeDistanceToLine(gameState, n->data);
             
-            
-            if(line >= 0) {
-                if(line < gameState->lines) {
+            // It  works trust me
+            /// i think
+            if(line > 0) {
+                if(line <= gameState->lines * 2) {
 
                     if(line % 2 == 0) {
+                        line = line / 2;
                         gameState->notes[(k * gameState->lines) + (gameState->lines - line)] = 2;
                     } else {
+                        line = line / 2;
                         int val = gameState->notes[(k * gameState->lines) + (gameState->lines - line)];
                         switch(val) {
                             case 0:
@@ -112,15 +115,25 @@ void update(GameState* gameState) {
                             case -1:
                                 gameState->notes[(k * gameState->lines) + (gameState->lines - line)] = 2;
                                 break;
-                            case 1:
-                                gameState->notes[(k * gameState->lines) + (gameState->lines - line)] = -1;
-                                break;
+                        }
+                        line++;
+                        val = gameState->notes[(k * gameState->lines) + (gameState->lines - line)];
+                        if(line >0 && gameState->lines >= line) {
+                            switch(val) {
+                                case 0:
+                                    gameState->notes[(k * gameState->lines) + (gameState->lines - line)] = -1;
+                                    break;
+                                case 1:
+                                    gameState->notes[(k * gameState->lines) + (gameState->lines - line)] = 2;
+                                    break;
+                            }
                         }
                     }
-                    //printf("%d:%d\n",(k * gameState->lines),(gameState->lines - line - 1));
                 } else {
                     break;
                 }
+                //if(line == 40)
+                //printf("%d\n", line);
             }
             n = n->next;
         }
@@ -139,7 +152,7 @@ void drawBoardInit(GameState* gameState) {
         printf("||                           \n");
     }
 
-    printf("                          ||________________________||                           \n");
+    printf("                          ||¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯||                           \n");
     printf("                          ||     |     ||     |     ||                           \n");
     printf("                          ||     |     ||     |     ||                           \n");
     printf("                          ||     |     ||     |     ||                           \n");
@@ -148,6 +161,18 @@ void drawBoardInit(GameState* gameState) {
 }
 
 void drawBoard(GameState* gameState) {
+
+    for(int k = 0; k < gameState->keys; k++) {
+        for(int l = 0; l < gameState->lines; l++) {
+            if(gameState->erase[(k * gameState->lines) + l] == 2) {
+                gameState->erase[(k * gameState->lines) + l] = 0;
+                int x = l;
+                int y = 29 + (k*6);
+                moveCursor(x,y);
+                printf("      ");
+            }
+        }
+    }
 
     for(int k = 0; k < gameState->keys; k++) {
         for(int l = 0; l < gameState->lines; l++) {
@@ -160,30 +185,18 @@ void drawBoard(GameState* gameState) {
                         gameState->erase[(k * gameState->lines) + l] = 2;
                     }
                     break;
-                case 1:
+                case -1:
                     printf("▄▄▄▄▄▄");
                     gameState->erase[(k * gameState->lines) + l] = 1;
                     break;
-                case -1:
+                case 1:
                     gameState->erase[(k * gameState->lines) + l] = 1;
-                    printf("▄▄▄▄▄▄");
+                    printf("▀▀▀▀▀▀");
                     break;
                 case 2:
                     gameState->erase[(k * gameState->lines) + l] = 1;
                     printf("██████");
                     break;
-            }
-        }
-    }
-
-    for(int k = 0; k < gameState->keys; k++) {
-        for(int l = 0; l < gameState->lines; l++) {
-            if(gameState->erase[(k * gameState->lines) + l] == 2) {
-                gameState->erase[(k * gameState->lines) + l] = 0;
-                int x = l;
-                int y = 29 + (k*6);
-                moveCursor(x,y);
-                printf("      ");
             }
         }
     }
@@ -242,7 +255,6 @@ Map* parseMap(char* path) {
 }
 
 int timeDistanceToLine(GameState* gameState, int time) {
-    //printf("(%d - %d) / %d",(gameState->time - gameState->start_time), (time * 1000), gameState->scrollspeed);
     return ((gameState->time - gameState->start_time) - time ) / (gameState->scrollspeed * 2);
 }
 
