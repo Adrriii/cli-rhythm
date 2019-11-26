@@ -27,7 +27,7 @@ void moveCursor(int x, int y) {
 
 
 void main(const char* argv, const int argc) {
-    char* map_path = "maps/map.cry";
+    char* map_path = "maps/map2.cry";
 
     int starttime;
     int lasttime;
@@ -38,6 +38,7 @@ void main(const char* argv, const int argc) {
     gameState->lines = 40;
     gameState->keys = 4;
     gameState->notes = (int*) calloc(gameState->keys * gameState->lines, sizeof(int));
+    gameState->erase = (int*) calloc(gameState->keys * gameState->lines, sizeof(int));
     
     gameState->map = parseMap(map_path);
     if(gameState->map == NULL) {
@@ -48,7 +49,7 @@ void main(const char* argv, const int argc) {
     int FPS_CAP = 1000 / 120;
     int ft;
 
-    gameState->scrollspeed = FPS_CAP * 2;
+    gameState->scrollspeed = FPS_CAP * 1.5;
 
     timeMs ( &(gameState->start_time) );
     timeMs ( &lasttime );
@@ -147,22 +148,42 @@ void drawBoardInit(GameState* gameState) {
 }
 
 void drawBoard(GameState* gameState) {
+
     for(int k = 0; k < gameState->keys; k++) {
         for(int l = 0; l < gameState->lines; l++) {
-            moveCursor(l,29 + (k*6));
+            int x = l;
+            int y = 29 + (k*6);
+            moveCursor(x,y);
             switch(gameState->notes[(k * gameState->lines) + l]) {
                 case 0:
-                    printf("      ");
+                    if(gameState->erase[(k * gameState->lines) + l] == 1) {
+                        gameState->erase[(k * gameState->lines) + l] = 2;
+                    }
                     break;
                 case 1:
                     printf("▄▄▄▄▄▄");
+                    gameState->erase[(k * gameState->lines) + l] = 1;
                     break;
                 case -1:
+                    gameState->erase[(k * gameState->lines) + l] = 1;
                     printf("▄▄▄▄▄▄");
                     break;
                 case 2:
+                    gameState->erase[(k * gameState->lines) + l] = 1;
                     printf("██████");
                     break;
+            }
+        }
+    }
+
+    for(int k = 0; k < gameState->keys; k++) {
+        for(int l = 0; l < gameState->lines; l++) {
+            if(gameState->erase[(k * gameState->lines) + l] == 2) {
+                gameState->erase[(k * gameState->lines) + l] = 0;
+                int x = l;
+                int y = 29 + (k*6);
+                moveCursor(x,y);
+                printf("      ");
             }
         }
     }

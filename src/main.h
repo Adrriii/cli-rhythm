@@ -28,6 +28,7 @@ typedef struct  {
     int scrollspeed;
     Map* map;
     int* notes;
+    int* erase;
 } GameState;
 
 void draw(GameState* gameState);
