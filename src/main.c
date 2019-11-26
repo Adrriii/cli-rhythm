@@ -64,6 +64,7 @@ void gameplay(Map* map) {
     timeMs ( &currenttime );
     gameState->time = currenttime;
     while(gameState->time - gameState->start_time < gameState->map->length) {
+        usleep(1);
         timeMs ( &currenttime );
         gameState->time = currenttime;
 
