@@ -26,6 +26,8 @@ void moveCursor(int x, int y) {
 
 
 void main(const char* argv, const int argc) {
+    char* map_path = "maps/map.cry";
+
     int starttime;
     int lasttime;
     int currenttime;
@@ -35,7 +37,12 @@ void main(const char* argv, const int argc) {
     gameState->lines = 40;
     gameState->keys = 4;
     gameState->notes = (int*) calloc(gameState->keys * gameState->lines, sizeof(int));
-    gameState->map = parseMap("map.cry");
+    
+    gameState->map = parseMap(map_path);
+    if(gameState->map == NULL) {
+        printf("Invalid map \"%s\"\n",map_path);
+        exit(0);
+    }
 
     int FPS_CAP = 1000 / 60;
     int ft;
@@ -46,7 +53,8 @@ void main(const char* argv, const int argc) {
     timeMs ( &lasttime );
 
 
-    clearScreen();drawBoardInit(gameState);
+    clearScreen();
+    drawBoardInit(gameState);
     timeMs ( &currenttime );
     gameState->time = currenttime;
     while(gameState->time - gameState->start_time < gameState->map->length) {
@@ -62,6 +70,8 @@ void main(const char* argv, const int argc) {
             timeMs ( &lasttime );
         }    
     }
+
+    clearScreen();
 }
 
 
@@ -145,6 +155,8 @@ Map* parseMap(char* path) {
     }
 
     FILE* fp = fopen(path, "r");
+    if(!fp) return NULL;
+
     int r;
     char line[100];
  
