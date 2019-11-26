@@ -5,6 +5,7 @@
 #include <string.h>
 
 #include "main.h"
+#include "convert.h"
 
 /**
  * Sets the variable to millisecond tim.
@@ -27,8 +28,11 @@ void moveCursor(int x, int y) {
 
 
 void main(const char* argv, const int argc) {
-    char* map_path = "maps/map.cry";
+    //gameplay(parseOsuMap("maps/map.cry"));
+    gameplay(parseOsuMap("E:/osu!/Songs/beatmap-637088221942779431-song/Unknown Artist - .= (Adri) [!].osu"));
+}
 
+void gameplay(Map* map) {
     int starttime;
     int lasttime;
     int currenttime;
@@ -40,9 +44,9 @@ void main(const char* argv, const int argc) {
     gameState->notes = (int*) calloc(gameState->keys * gameState->lines, sizeof(int));
     gameState->erase = (int*) calloc(gameState->keys * gameState->lines, sizeof(int));
     
-    gameState->map = parseMap(map_path);
+    gameState->map = map;
     if(gameState->map == NULL) {
-        printf("Invalid map \"%s\"\n",map_path);
+        printf("Invalid map\n");
         exit(0);
     }
 
@@ -175,7 +179,8 @@ void drawBoard(GameState* gameState) {
     }
 
     for(int k = 0; k < gameState->keys; k++) {
-        for(int l = 0; l < gameState->lines; l++) {
+        // start at 1 because weird but lazy to fix
+        for(int l = 1; l < gameState->lines; l++) {
             int x = l;
             int y = 29 + (k*6);
             moveCursor(x,y);
@@ -202,105 +207,6 @@ void drawBoard(GameState* gameState) {
     }
 }
 
-Map* parseMap(char* path) {
-    Map* map = (Map*) malloc(sizeof(Map));
-
-    map->columns = (node**) malloc(sizeof(node*) * 4);
-    for(int k = 0; k < 4; k++) {
-        map->columns[k] = newList(-1,NULL);
-    }
-
-    FILE* fp = fopen(path, "r");
-    if(!fp) return NULL;
-
-    int r;
-    char line[100];
- 
-    ParseState state = UNKNOWN;
-
-    while ((r = fscanf(fp, "%s\n", line)) != EOF) {
-        if(!strcmp(line,"")) continue;
-        
-        if(!strcmp(line,";meta")) {
-            state = META;
-            continue;
-        }
-        if(!strcmp(line,";notes")) {
-            state = NOTES;
-            continue;
-        }
-        
-        char* type;
-        int value;
-        int time,col;
-
-        switch(state) {
-            case META:
-                type = strtok(line,":");
-                
-                if(!strcmp(type,"length")) {
-                    map->length = atoi(strtok(NULL,":"));
-                }
-                break;
-            case NOTES:
-                sscanf(line,"%d,%d",&time,&col);
-                append(map->columns[col-1], time);
-                break;
-            default:
-                break;
-        }
-    }
-
-    return map;
-}
-
 int timeDistanceToLine(GameState* gameState, int time) {
     return ((gameState->time - gameState->start_time) - time ) / (gameState->scrollspeed * 2);
-}
-
-
-//////////////
-
-node* newList(int data,node* next)
-{
-    node* new_node = (node*)malloc(sizeof(node));
-    if(new_node == NULL)
-    {
-        printf("Error creating a new node.\n");
-        exit(0);
-    }
-    new_node->data = data;
-    new_node->next = next;
- 
-    return new_node;
-}
-
-node* append(node* head, int data)
-{
-    /* go to the last node */
-    node* cursor = head;
-    while(cursor->next != NULL)
-        cursor = cursor->next;
- 
-    /* create a new node */
-    node* new_node =  newList(data,NULL);
-    cursor->next = new_node;
-    return head;
-}
-
-void dispose(node* head)
-{
-    node* cursor, *tmp;
- 
-    if(head != NULL)
-    {
-        cursor = head->next;
-        head->next = NULL;
-        while(cursor != NULL)
-        {
-            tmp = cursor->next;
-            free(cursor);
-            cursor = tmp;
-        }
-    }
 }
