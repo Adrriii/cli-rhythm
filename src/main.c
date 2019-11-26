@@ -29,7 +29,7 @@ void moveCursor(int x, int y) {
 
 void main(const char* argv, const int argc) {
     //gameplay(parseOsuMap("maps/map.cry"));
-    gameplay(parseOsuMap("E:/osu!/Songs/beatmap-637088221942779431-song/Unknown Artist - .= (Adri) [!].osu"));
+    gameplay(parseOsuMap("osumaps/Unknown Artist - .= (Adri) [!].osu"));
 }
 
 void gameplay(Map* map) {
