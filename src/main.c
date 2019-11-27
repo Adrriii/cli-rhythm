@@ -29,7 +29,7 @@ void moveCursor(int x, int y) {
 
 void main(const char* argv, const int argc) {
     //gameplay(parseOsuMap("maps/map.cry"));
-    gameplay(parseOsuMap("osumaps/lamprey_hole/Unknown Artist - .= (Adri) [Lamprey Hole].osu"));
+    gameplay(parseOsuMap("osumaps/beatmap-nitori-get-down-geddan-reuploaded-high-quality/Kohmi Hirose - Promise (Geddan) (Adri) [Get Down].osu"));
 }
 
 void gameplay(Map* map) {
@@ -55,14 +55,14 @@ void gameplay(Map* map) {
 
     gameState->scrollspeed = FPS_CAP / 1.5;
 
-    system("vlc -I dummy osumaps/lamprey_hole/lamprey.mp3 > /dev/null 2> /dev/null &");
-    usleep(300000);
+    clearScreen();
+    drawBoardInit(gameState);
+    system("vlc -I dummy osumaps/beatmap-nitori-get-down-geddan-reuploaded-high-quality/audio.mp3 > /dev/null 2> /dev/null &");
+    usleep(200000);
     timeMs ( &(gameState->start_time) );
     timeMs ( &lasttime );
 
 
-    clearScreen();
-    drawBoardInit(gameState);
     timeMs ( &currenttime );
     gameState->time = currenttime;
     while(gameState->time - gameState->start_time < gameState->map->length) {
@@ -161,13 +161,26 @@ void drawBoardInit(GameState* gameState) {
 
     printf("                          ||¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯||                           \n");
     printf("                          ||     |     ||     |     ||                           \n");
-    printf("                          ||     |     ||     |     ||                           \n");
+    printf("                          ||  D  |  F  ||  J  |  K  ||                           \n");
     printf("                          ||     |     ||     |     ||                           \n");
     printf("                          ||________________________||                           \n");
  
 }
 
 void drawBoard(GameState* gameState) {
+
+    for(int k = 0; k < gameState->keys; k++) {
+        // start at 1 because weird but lazy to fix
+        for(int l = 1; l < gameState->lines; l++) {
+            switch(gameState->notes[(k * gameState->lines) + l]) {
+                case 0:
+                    if(gameState->erase[(k * gameState->lines) + l] == 1) {
+                        gameState->erase[(k * gameState->lines) + l] = 2;
+                    }
+                    break;
+            }
+        }
+    }
 
     for(int k = 0; k < gameState->keys; k++) {
         for(int l = 0; l < gameState->lines; l++) {
@@ -188,11 +201,6 @@ void drawBoard(GameState* gameState) {
             int y = 29 + (k*6);
             moveCursor(x,y);
             switch(gameState->notes[(k * gameState->lines) + l]) {
-                case 0:
-                    if(gameState->erase[(k * gameState->lines) + l] == 1) {
-                        gameState->erase[(k * gameState->lines) + l] = 2;
-                    }
-                    break;
                 case -1:
                     printf("▄▄▄▄▄▄");
                     gameState->erase[(k * gameState->lines) + l] = 1;
