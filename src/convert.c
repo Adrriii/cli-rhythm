@@ -12,18 +12,27 @@ Map* parseOsuMap(char* path) {
 
     int r;
     char line[100];
+
  
     int notes = 0;
+    int meta = 0;
     int maxt = 0;
 
     while ((r = fscanf(fp, "%s\n", line)) != EOF) {
         if(!strcmp(line,"[HitObjects]")) {
+            meta = 0;
             notes = 1;
+            continue;
+        }
+        if(!strcmp(line,"[General]")) {
+            notes = 0;
+            meta = 1;
             continue;
         }
     
         if(!strcmp(line,"")) {
             notes = 0;
+            meta = 0;
         }
 
         if(notes) {
@@ -45,15 +54,30 @@ Map* parseOsuMap(char* path) {
                 col = 3;
             }
 
-    printf("convert %d\n",col);
             append(map->columns[col], time);
 
             if(time > maxt) {
                 maxt = time;
             }
+            map->length = maxt + 1000;
+
+            continue;
         }
 
-        map->length = maxt + 1000;
+        if(meta) {
+            char* type;
+            type = strtok(line, ":");
+
+            if(!strcmp(type,"AudioFilename")) {
+                map->audio_path = strtok(NULL, ":");
+
+                //if (map->audio_path[0] == ' ') 
+                    //memmove(map->audio_path, map->audio_path+1, strlen(map->audio_path));
+            }
+
+            //free(type);
+        }
+
     }
 
     return map;

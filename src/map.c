@@ -50,6 +50,10 @@ Map* parseMap(char* path) {
                 if(!strcmp(type,"length")) {
                     map->length = atoi(strtok(NULL,":"));
                 }
+                
+                if(!strcmp(type,"audio")) {
+                    map->audio_path = strtok(NULL,":");
+                }
                 break;
             case NOTES:
                 sscanf(line,"%d,%d",&time,&col);

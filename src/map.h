@@ -11,6 +11,7 @@ typedef enum {
 
 typedef struct {
     int length;
+    char* audio_path;
     node** columns;
 } Map;
 

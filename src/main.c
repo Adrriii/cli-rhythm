@@ -29,7 +29,7 @@ void moveCursor(int x, int y) {
 
 void main(const char* argv, const int argc) {
     //gameplay(parseOsuMap("maps/map.cry"));
-    gameplay(parseOsuMap("osumaps/Unknown Artist - .= (Adri) [!].osu"));
+    gameplay(parseOsuMap("osumaps/lamprey_hole/Unknown Artist - .= (Adri) [Lamprey Hole].osu"));
 }
 
 void gameplay(Map* map) {
@@ -55,6 +55,8 @@ void gameplay(Map* map) {
 
     gameState->scrollspeed = FPS_CAP / 1.5;
 
+    system("vlc -I dummy osumaps/lamprey_hole/lamprey.mp3 > /dev/null 2> /dev/null &");
+    usleep(300000);
     timeMs ( &(gameState->start_time) );
     timeMs ( &lasttime );
 
@@ -211,3 +213,4 @@ void drawBoard(GameState* gameState) {
 int timeDistanceToLine(GameState* gameState, int time) {
     return ((gameState->time - gameState->start_time) - time ) / (gameState->scrollspeed * 2);
 }
+
