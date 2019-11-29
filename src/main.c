@@ -29,7 +29,7 @@ void moveCursor(int x, int y) {
 
 void main(const char* argv, const int argc) {
     //gameplay(parseOsuMap("maps/map.cry"));
-    gameplay(parseOsuMap("osumaps/beatmap-nitori-get-down-geddan-reuploaded-high-quality/Kohmi Hirose - Promise (Geddan) (Adri) [Get Down].osu"));
+    gameplay(parseOsuMap("maps/osumaps/beatmap-nitori-get-down-geddan-reuploaded-high-quality/","Kohmi Hirose - Promise (Geddan) (Adri) [Get Down].osu"));
 }
 
 void gameplay(Map* map) {
@@ -57,7 +57,13 @@ void gameplay(Map* map) {
 
     clearScreen();
     drawBoardInit(gameState);
-    system("vlc -I dummy osumaps/beatmap-nitori-get-down-geddan-reuploaded-high-quality/audio.mp3 > /dev/null 2> /dev/null &");
+    
+    char* cmd = malloc(sizeof(char) * 255);
+    strcpy(cmd,"vlc -I dummy ");
+    strcat(cmd, map->audio_path);
+    strcat(cmd, " > /dev/null 2> /dev/null &");
+    system(cmd);
+
     usleep(200000);
     timeMs ( &(gameState->start_time) );
     timeMs ( &lasttime );
@@ -81,6 +87,7 @@ void gameplay(Map* map) {
     }
 
     clearScreen();
+    printf("%d",gameState->map->length);
 }
 
 

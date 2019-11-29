@@ -4,21 +4,28 @@
 
 #include "convert.h"
 
-Map* parseOsuMap(char* path) {
+Map* parseOsuMap(char* folder,char* file) {
     Map* map = newMap();
 
-    FILE* fp = fopen(path, "r");
+    char* file_path = malloc(sizeof(char) * 255);
+    strcpy(file_path, folder);
+    map->audio_path = malloc(sizeof(char) * 255);
+    strcpy(map->audio_path, folder);
+    strcat(file_path, file);
+    FILE* fp = fopen(file_path, "r");
     if(!fp) return NULL;
 
     int r;
-    char line[100];
+    char line[255];
 
  
     int notes = 0;
     int meta = 0;
     int maxt = 0;
 
-    while ((r = fscanf(fp, "%s\n", line)) != EOF) {
+    while(fgets(line, 255, (FILE*) fp)) {
+        line[strlen(line) -1] = '\0';
+        
         if(!strcmp(line,"[HitObjects]")) {
             meta = 0;
             notes = 1;
@@ -60,22 +67,26 @@ Map* parseOsuMap(char* path) {
                 maxt = time;
             }
             map->length = maxt + 1000;
-
             continue;
         }
 
         if(meta) {
             char* type;
             type = strtok(line, ":");
-
             if(!strcmp(type,"AudioFilename")) {
-                map->audio_path = strtok(NULL, ":");
+                char* audio_name = strtok(NULL, ":");
 
-                //if (map->audio_path[0] == ' ') 
-                    //memmove(map->audio_path, map->audio_path+1, strlen(map->audio_path));
+                if(audio_name == NULL) {
+                    map->audio_path = "None";
+                    continue;
+                }
+                
+                if (audio_name[0] == ' ') {
+                    memmove(audio_name, audio_name+1, strlen(audio_name));
+                }
+
+                strcat(map->audio_path, audio_name);
             }
-
-            //free(type);
         }
 
     }

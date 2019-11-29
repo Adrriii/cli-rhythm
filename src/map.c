@@ -12,6 +12,8 @@ Map* newMap() {
     for(int k = 0; k < 4; k++) {
         map->columns[k] = newList(-1,NULL);
     }
+    map->audio_path = malloc(sizeof(char)*255);
+    strcpy(map->audio_path,"maps/");
 
     return map;
 }
@@ -24,7 +26,8 @@ Map* parseMap(char* path) {
 
     int r;
     char line[100];
- 
+    
+
     ParseState state = UNKNOWN;
 
     while ((r = fscanf(fp, "%s\n", line)) != EOF) {
@@ -52,7 +55,7 @@ Map* parseMap(char* path) {
                 }
                 
                 if(!strcmp(type,"audio")) {
-                    map->audio_path = strtok(NULL,":");
+                    char* audio_name = strtok(NULL,":");
                 }
                 break;
             case NOTES:

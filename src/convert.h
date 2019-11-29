@@ -1,4 +1,4 @@
 
 #include "map.h"
 
-Map* parseOsuMap(char* path);
+Map* parseOsuMap(char* folder, char* file);
